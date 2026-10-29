@@ -33,6 +33,31 @@
 //-----------------------------------------------------------------
 
 //-----------------------------------------------------------------
+//                       MODIFICATION NOTICE
+//                   (GNU LGPL-2.1, Section 2b)
+//
+// This file is a MODIFIED copy of the UART -> AXI Debug Bridge.
+// Original work: Copyright (C) 2017-2019 Ultra-Embedded.com
+//   https://github.com/ultraembedded/dbg_bridge
+//   (baseline revision 3ea8f99)
+//
+// Modified by: whx <253616211@qq.com>
+// Changes Copyright (C) 2026 whx
+// Date of change: 2026-10-29
+//
+// Changes relative to the baseline:
+//   - Reworked TXD output generation: the original combinational txd_r
+//     logic is retained as a comment for reference, and txd_q is now
+//     driven directly from tx_bits_q / tx_shift_reg_q in the registered
+//     transmit path.
+//   - Re-formatted the surrounding always block.
+//
+// This file remains licensed under the GNU Lesser General Public License,
+// version 2.1 or (at your option) any later version. See the LICENSE file
+// in the root of this repository.
+//-----------------------------------------------------------------
+
+//-----------------------------------------------------------------
 //                          Generated File
 //-----------------------------------------------------------------
 module dbg_bridge_uart
@@ -303,6 +328,9 @@ end
 //-----------------------------------------------------------------
 // UART Tx Pin
 //-----------------------------------------------------------------
+/* --- ORIGINAL UPSTREAM LOGIC (txd_r), kept for reference. Disabled by
+   this fork on 2026-10-29; see the MODIFICATION NOTICE at the top of this
+   file. ---
 reg txd_r;
 
 always @ *
@@ -322,12 +350,28 @@ begin
             txd_r = tx_shift_reg_q[0];
     end
 end
+*/
 
 always @ (posedge clk_i or posedge rst_i)
 if (rst_i)
-    txd_q <= 1'b1;
+txd_q <= 1'b1;
 else
-    txd_q <= txd_r;
+begin
+if (tx_busy_q)
+begin
+// Start bit (TXD = L)
+if (tx_bits_q == START_BIT)
+txd_q <= 1'b0;
+// Stop bits (TXD = H)
+else if (tx_bits_q == STOP_BIT0 || tx_bits_q == STOP_BIT1)
+txd_q <= 1'b1;
+// Data bits
+else
+txd_q <= tx_shift_reg_q[0];
+end
+else
+txd_q <= 1'b1;     
+end
 
 //-----------------------------------------------------------------
 // Outputs

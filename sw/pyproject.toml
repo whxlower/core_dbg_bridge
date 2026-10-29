@@ -1,0 +1,19 @@
+[project]
+name = "uart2axi"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "whx", email = "253616211@qq.com" }
+]
+requires-python = ">=3.11"
+license = { text = "LGPL-2.1-or-later" }  # SPDX id; PEP 639 tooling may use: license = "LGPL-2.1-or-later"
+dependencies = [
+    "pyserial>=3.5",
+]
+
+[project.urls]
+Upstream = "https://github.com/ultraembedded/dbg_bridge"
+Repository = "https://github.com/whxlower/core_dbg_bridge"
+
+

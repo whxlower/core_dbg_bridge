@@ -1,0 +1,96 @@
+core_dbg_bridge -- NOTICE / Attribution
+=======================================
+
+1. Upstream project
+-------------------
+  UART -> AXI Debug Bridge
+    https://github.com/ultraembedded/dbg_bridge
+    (extracted from https://github.com/ultraembedded/cores/tree/master/dbg_bridge)
+
+  Copyright (C) 2017-2019 Ultra-Embedded.com
+  Contact: admin@ultra-embedded.com
+
+  Licensed under the GNU Lesser General Public License, version 2.1 or
+  (at your option) any later version (LGPL-2.1-or-later). The full license
+  text is in the LICENSE file of this repository.
+
+  Baseline revision imported into this fork: 3ea8f99
+  ("Fix off by 1 error in baud rate calculation.")
+
+2. This repository
+------------------
+  This repository is an UNOFFICIAL fork maintained by
+    whx <253616211@qq.com>
+    https://github.com/whxlower/core_dbg_bridge
+
+  It is NOT an official release of Ultra-Embedded.com and is neither
+  affiliated with nor endorsed by Ultra-Embedded.com. Please report issues
+  to THIS repository, not to the upstream author.
+
+3. Modifications (LGPL-2.1, Section 2b)
+---------------------------------------
+  Changes Copyright (C) 2026 whx <253616211@qq.com>
+  Date of change: 2026-10-29
+
+  src_v/dbg_bridge.v
+    - Memory interface ports renamed to AXI4 names (mem_* -> m_axi_*).
+    - Added AXI4 attribute outputs: awsize, awprot, awcache, arsize,
+      arprot, arcache.
+    - Added byte-lane write strobes (mem_sel_q / mem_sel_r) driving
+      m_axi_wstrb, replacing the fixed 4'b1111 strobe.
+    - Removed the bid/rid ports; burst responses no longer depend on them.
+    - rst_i is now an internal signal derived from ~m_axi_aresetn.
+    - State machine, channel handshakes and GPIO write path rewritten and
+      re-formatted; the UART wire protocol is unchanged.
+
+  src_v/dbg_bridge_uart.v
+    - Reworked TXD output generation: the original combinational txd_r
+      logic is retained as a comment for reference, and txd_q is now driven
+      directly from tx_bits_q / tx_shift_reg_q in the registered transmit
+      path.
+
+  Files ADDED by this fork (new work, not derived from the upstream RTL):
+    sw/uart2axi_gui.py      Tkinter GUI for register / GPIO / memory access
+    sw/build_exe.ps1        PyInstaller packaging script
+    sw/pyproject.toml       uv / PEP 621 project metadata
+    sw/README.md            usage notes for the sw/ tools
+    sw/.gitignore
+    sw/.python-version
+    sw/uv.lock              generated lock file
+
+  Files UNCHANGED from upstream (verbatim, still LGPL-2.1-or-later):
+    src_v/dbg_bridge_fifo.v
+    sw/bus_interface.py
+    sw/dump.py
+    sw/load_bin.py
+    sw/peek.py
+    sw/poke.py
+    sw/socket_interface.py
+    sw/uart_bus_interface.py
+    (Upstream ships no per-file license header for the python tools; their
+    license is stated here and in LICENSE.)
+
+4. Licensing of this repository as a whole
+------------------------------------------
+  Every file in this repository is distributed under the GNU Lesser General
+  Public License, version 2.1 or (at your option) any later version. See
+  LICENSE for the full text. The new files listed in section 3 are released
+  under the same terms, both for consistency and to satisfy LGPL-2.1
+  section 2c.
+
+  If you redistribute this repository, or any binary or FPGA bitstream built
+  from it, you must:
+    * keep LICENSE, this NOTICE and all copyright notices intact;
+    * state that the files were modified and when (section 3 above does
+      this for this repository);
+    * make the complete corresponding source code available to recipients
+      (LGPL-2.1 sections 1, 2 and 4/6) -- for this repository that means
+      pointing them at this repository, including these build scripts.
+
+  No additional restrictions are placed on any recipient's exercise of the
+  rights granted by LGPL-2.1.
+
+5. No warranty
+--------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. See
+  LGPL-2.1 sections 15 and 16.
